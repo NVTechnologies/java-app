@@ -1,0 +1,23 @@
+pipeline{
+    agent any
+  //  environment {
+  //  def MavenHome = tool name:'MAVEN-3.8.6', type:'maven'
+  //  }
+    tools {
+        // Install the Maven version configured as "M3" and add it to the path.
+        maven "MAVEN-3.8.6"
+    }
+    stages{
+       stage('GitClone'){
+            steps{
+                 git 'https://github.com/NVTechnologies/java-maven-application.git'
+            }
+         }        
+       stage('Build'){
+            steps{
+                sh 'mvn clean package'
+            }
+         }
+       
+    }
+}
