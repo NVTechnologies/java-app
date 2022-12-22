@@ -6,7 +6,7 @@ pipeline{
     stages{
        stage('GitClone'){
             steps{
-                 git 'https://github.com/NVTechnologies/java-app.git'
+                 git 'https://github.com/NVTechnologies/java-maven-application.git'
             }
          }        
        stage('Build'){
