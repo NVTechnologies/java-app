@@ -1,0 +1,26 @@
+pipeline{
+    agent any
+    environment {
+    def MavenHome = tool name:'MAVEN-3.8.6', type:'maven'
+    }
+    stages{
+       stage('GitClone'){
+            steps{
+                 git credentialsId: '507ceea8-12ac-40ab-8dc0-d7bb1d2b92e7', url: 'https://github.com/NVTechnologies/java-maven-application.git'
+            }
+         }
+        stage('Build Package'){
+            steps{
+                sh "${MavenHome}/bin/mvn clean package"
+            }
+         }
+          stage('SonarQube Code Quality') {
+//    def scannerHome = tool 'SonarScanner 4.0';
+        steps{
+        withSonarQubeEnv('sonarqube-8.9.10') { 
+        sh "${MavenHome}/bin/mvn sonar:sonar"
+    }
+        }
+        }
+    }
+}
