@@ -14,17 +14,13 @@ pipeline{
                 sh "${MavenHome}/bin/mvn clean package"
             }
          }
-        stage('SonarQube analysis') {
-//    def scannerHome = tool 'SonarScanner 4.0';
-        steps{
-        withSonarQubeEnv('sonarqube-8.9.10') { 
-        sh "${MavenHome}/bin/mvn sonar:sonar"
-    }
-        }
-        }
-        stage('Upload war package to Nexus'){
+       stage('Upload war package to Nexus'){
             steps{
                 script{
+                def readPomVersion = readMavenPom file: 'pom.xml'
+                
+                def nexusRepo = readPomVersion.version.endsWith("SNAPSHOT") ? "java-maven-snapshot" : "java-maven-release"
+                
                    nexusArtifactUploader artifacts: 
                    [
                        [
@@ -41,8 +37,8 @@ pipeline{
                            nexusUrl: '15.207.120.123:8081/', 
                            nexusVersion: 'nexus3', 
                            protocol: 'http', 
-                           repository: 'java-maven-release', 
-                           version: '1.0.0'
+                           repository: nexusRepo, 
+                           version: "${readPomVersion.version}"
                 }
             }
        }
