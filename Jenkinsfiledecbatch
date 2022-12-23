@@ -6,15 +6,15 @@ pipeline{
     stages{
        stage('GitClone'){
             steps{
-                 git credentialsId: '507ceea8-12ac-40ab-8dc0-d7bb1d2b92e7', url: 'https://github.com/NVTechnologies/java-maven-application.git'
+                 git 'https://github.com/NVTechnologies/java-maven-application.git'
             }
-         }
-        stage('Build Package'){
+         }        
+       stage('Build'){
             steps{
                 sh "${MavenHome}/bin/mvn clean package"
             }
          }
-          stage('SonarQube Code Quality') {
+        stage('SonarQube analysis') {
 //    def scannerHome = tool 'SonarScanner 4.0';
         steps{
         withSonarQubeEnv('sonarqube-8.9.10') { 
@@ -22,5 +22,30 @@ pipeline{
     }
         }
         }
+        stage('Upload war package to Nexus'){
+            steps{
+                script{
+                   nexusArtifactUploader artifacts: 
+                   [
+                       [
+                           artifactId: 'maven-project', 
+                           classifier: '', 
+                           file: 'webapp/target/webapp.war', 
+                           type: 'war'
+                           
+                           ]
+                        ], 
+                           
+                           credentialsId: 'nexus-credentials', 
+                           groupId: 'com.example.maven-project', 
+                           nexusUrl: '15.207.120.123:8081/', 
+                           nexusVersion: 'nexus3', 
+                           protocol: 'http', 
+                           repository: 'java-maven-release', 
+                           version: '1.0.0'
+                }
+            }
+       }
+       
     }
 }
