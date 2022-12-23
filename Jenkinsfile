@@ -22,6 +22,30 @@ pipeline{
     }
         }
         }
+        stage('Upload war package to Nexus'){
+            steps{
+                script{
+                   nexusArtifactUploader artifacts: 
+                   [
+                       [
+                           artifactId: 'maven-project', 
+                           classifier: '', 
+                           file: 'webapp/target/webapp.war', 
+                           type: 'war'
+                           
+                           ]
+                        ], 
+                           
+                           credentialsId: 'nexus-credentials', 
+                           groupId: 'com.example.maven-project', 
+                           nexusUrl: '15.207.120.123:8081/', 
+                           nexusVersion: 'nexus3', 
+                           protocol: 'http', 
+                           repository: 'java-maven-release', 
+                           version: '1.0.0'
+                }
+            }
+       }
        
     }
 }
